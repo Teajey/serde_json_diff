@@ -8,9 +8,9 @@ pub enum EntryDifference {
 }
 
 #[derive(Debug)]
-pub struct ArrayElementDifferences(Vec<(usize, Difference)>);
+pub struct DumbMap<K: Serialize, V: Serialize>(Vec<(K, V)>);
 
-impl Serialize for ArrayElementDifferences {
+impl<K: Serialize, V: Serialize> Serialize for DumbMap<K, V> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -29,7 +29,7 @@ pub struct ArrayLengthDifference(usize, usize);
 #[derive(Debug, Serialize)]
 pub enum ArrayDifference {
     LengthMismatch(ArrayLengthDifference),
-    MismatchingElements(ArrayElementDifferences),
+    MismatchingElements(DumbMap<usize, Difference>),
 }
 
 #[derive(Debug, Serialize)]
@@ -50,35 +50,12 @@ pub enum ValueMismatch {
     Number(serde_json::Number, serde_json::Number),
 }
 
-#[derive(Debug)]
-pub struct ObjectEntryDifferences(Vec<(String, EntryDifference)>);
-
-impl Serialize for ObjectEntryDifferences {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut map = serializer.serialize_map(Some(self.0.len()))?;
-        for (key, diff) in &self.0 {
-            match diff {
-                diff @ (EntryDifference::ExtraKey | EntryDifference::MissingKey) => {
-                    map.serialize_entry(key, diff)?;
-                }
-                EntryDifference::Value(diff) => {
-                    map.serialize_entry(key, diff)?;
-                }
-            }
-        }
-        map.end()
-    }
-}
-
 #[derive(Debug, Serialize)]
 pub enum Difference {
     ValueMismatch(ValueMismatch),
     TypeMismatch(Type, Type),
     Array(ArrayDifference),
-    Object(ObjectEntryDifferences),
+    Object(DumbMap<String, EntryDifference>),
 }
 
 #[must_use]
@@ -102,9 +79,9 @@ pub fn arrays(a: Vec<serde_json::Value>, b: Vec<serde_json::Value>) -> Option<Ar
     if element_differences.is_empty() {
         None
     } else {
-        Some(ArrayDifference::MismatchingElements(
-            ArrayElementDifferences(element_differences),
-        ))
+        Some(ArrayDifference::MismatchingElements(DumbMap(
+            element_differences,
+        )))
     }
 }
 
@@ -112,7 +89,7 @@ pub fn arrays(a: Vec<serde_json::Value>, b: Vec<serde_json::Value>) -> Option<Ar
 pub fn objects(
     a: serde_json::Map<String, serde_json::Value>,
     mut b: serde_json::Map<String, serde_json::Value>,
-) -> Option<ObjectEntryDifferences> {
+) -> Option<DumbMap<String, EntryDifference>> {
     let mut value_differences = a
         .into_iter()
         .filter_map(|(key, a)| {
@@ -132,7 +109,7 @@ pub fn objects(
     if value_differences.is_empty() {
         None
     } else {
-        Some(ObjectEntryDifferences(value_differences))
+        Some(DumbMap(value_differences))
     }
 }
 
