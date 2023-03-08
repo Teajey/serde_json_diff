@@ -1,0 +1,40 @@
+---
+source: tests/compare.rs
+expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
+---
+{
+  "-20": "MissingKey",
+  "100": "ExtraKey",
+  "3": {
+    "TypeMismatch": [
+      "Number",
+      "String"
+    ]
+  },
+  "4": {
+    "Array": {
+      "LengthMismatch": [
+        2,
+        3
+      ]
+    }
+  },
+  "5": {
+    "Array": {
+      "MismatchingElements": {
+        "1": {
+          "ValueMismatch": [
+            "5",
+            "7"
+          ]
+        }
+      }
+    }
+  },
+  "numbero": {
+    "ValueMismatch": [
+      1,
+      7
+    ]
+  }
+}
