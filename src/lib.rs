@@ -24,12 +24,9 @@ impl<K: Serialize, V: Serialize> Serialize for DumbMap<K, V> {
 }
 
 #[derive(Debug, Serialize)]
-pub struct ArrayLengthDifference(usize, usize);
-
-#[derive(Debug, Serialize)]
 pub enum ArrayDifference {
-    LengthMismatch(ArrayLengthDifference),
-    MismatchingElements(DumbMap<usize, Difference>),
+    Length(usize, usize),
+    Element(DumbMap<usize, Difference>),
 }
 
 #[derive(Debug, Serialize)]
@@ -44,7 +41,7 @@ pub enum Type {
 
 #[derive(Debug, Serialize)]
 #[serde(untagged)]
-pub enum ValueMismatch {
+pub enum ScalarDifference {
     Bool(bool, bool),
     String(String, String),
     Number(serde_json::Number, serde_json::Number),
@@ -52,8 +49,8 @@ pub enum ValueMismatch {
 
 #[derive(Debug, Serialize)]
 pub enum Difference {
-    ValueMismatch(ValueMismatch),
-    TypeMismatch(Type, Type),
+    Scalar(ScalarDifference),
+    Type(Type, Type),
     Array(ArrayDifference),
     Object(DumbMap<String, EntryDifference>),
 }
@@ -64,9 +61,7 @@ pub fn arrays(a: Vec<serde_json::Value>, b: Vec<serde_json::Value>) -> Option<Ar
     let b_len = b.len();
 
     if a_len != b_len {
-        return Some(ArrayDifference::LengthMismatch(ArrayLengthDifference(
-            a_len, b_len,
-        )));
+        return Some(ArrayDifference::Length(a_len, b_len));
     }
 
     let element_differences = a
@@ -79,9 +74,7 @@ pub fn arrays(a: Vec<serde_json::Value>, b: Vec<serde_json::Value>) -> Option<Ar
     if element_differences.is_empty() {
         None
     } else {
-        Some(ArrayDifference::MismatchingElements(DumbMap(
-            element_differences,
-        )))
+        Some(ArrayDifference::Element(DumbMap(element_differences)))
     }
 }
 
@@ -136,25 +129,25 @@ pub fn values(a: serde_json::Value, b: serde_json::Value) -> Option<Difference> 
             if a == b {
                 None
             } else {
-                Some(Difference::ValueMismatch(ValueMismatch::Bool(a, b)))
+                Some(Difference::Scalar(ScalarDifference::Bool(a, b)))
             }
         }
         (Number(a), Number(b)) => {
             if a == b {
                 None
             } else {
-                Some(Difference::ValueMismatch(ValueMismatch::Number(a, b)))
+                Some(Difference::Scalar(ScalarDifference::Number(a, b)))
             }
         }
         (String(a), String(b)) => {
             if a == b {
                 None
             } else {
-                Some(Difference::ValueMismatch(ValueMismatch::String(a, b)))
+                Some(Difference::Scalar(ScalarDifference::String(a, b)))
             }
         }
         (Array(a), Array(b)) => arrays(a, b).map(Difference::Array),
         (Object(a), Object(b)) => objects(a, b).map(Difference::Object),
-        (a, b) => Some(Difference::TypeMismatch(a.into(), b.into())),
+        (a, b) => Some(Difference::Type(a.into(), b.into())),
     }
 }

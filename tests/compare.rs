@@ -1,30 +1,22 @@
 use serde_json::json;
 
-/*
- MissingKey
- ExtraKey
- ValueMismatch
- TypeMismatch
- LengthMismatch
- MismatchingElements
-*/
 #[test]
 fn kitchen_sink() {
     let a = json!({
       "matches": "a",
       "missing_key": "a",
-      "value_mismatch": 1,
-      "type_mismatch": 1,
-      "length_mismatch": [],
-      "mismatching_elements": ["a", "a"],
+      "value_difference": 1,
+      "type_difference": 1,
+      "length_difference": [],
+      "different_elements": ["a", "a"],
     });
     let b = json!({
       "matches": "a",
       "extra_key": "b",
-      "value_mismatch": 2,
-      "type_mismatch": "1",
-      "length_mismatch": [true],
-      "mismatching_elements": ["a", "ab"],
+      "value_difference": 2,
+      "type_difference": "1",
+      "length_difference": [true],
+      "different_elements": ["a", "ab"],
     });
 
     let diff = serde_json_compare::values(a, b);
