@@ -1,15 +1,4 @@
-use serde::{
-    ser::{SerializeMap, SerializeTuple},
-    Serialize,
-};
-
-#[derive(Debug, Serialize)]
-pub enum Leaf {
-    Null,
-    Bool(bool),
-    Number(serde_json::Number),
-    String(String),
-}
+use serde::{ser::SerializeMap, Serialize};
 
 #[derive(Debug, Serialize)]
 pub enum EntryDifference {
@@ -53,35 +42,12 @@ pub enum Type {
     Number,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(untagged)]
 pub enum ValueMismatch {
     Bool(bool, bool),
     String(String, String),
     Number(serde_json::Number, serde_json::Number),
-}
-
-impl Serialize for ValueMismatch {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut tuple = serializer.serialize_tuple(2)?;
-        match self {
-            ValueMismatch::Bool(a, b) => {
-                tuple.serialize_element(a)?;
-                tuple.serialize_element(b)?;
-            }
-            ValueMismatch::String(a, b) => {
-                tuple.serialize_element(a)?;
-                tuple.serialize_element(b)?;
-            }
-            ValueMismatch::Number(a, b) => {
-                tuple.serialize_element(a)?;
-                tuple.serialize_element(b)?;
-            }
-        }
-        tuple.end()
-    }
 }
 
 #[derive(Debug)]
@@ -170,18 +136,25 @@ pub fn objects(
     }
 }
 
+impl From<serde_json::Value> for Type {
+    fn from(value: serde_json::Value) -> Self {
+        match value {
+            serde_json::Value::Null => Type::Null,
+            serde_json::Value::Bool(_) => Type::Bool,
+            serde_json::Value::Number(_) => Type::Number,
+            serde_json::Value::String(_) => Type::String,
+            serde_json::Value::Array(_) => Type::Array,
+            serde_json::Value::Object(_) => Type::Object,
+        }
+    }
+}
+
 #[must_use]
 pub fn values(a: serde_json::Value, b: serde_json::Value) -> Option<Difference> {
     use serde_json::Value::{Array, Bool, Null, Number, Object, String};
 
     match (a, b) {
         (Null, Null) => None,
-        (Null, Bool(_)) => Some(Difference::TypeMismatch(Type::Null, Type::Bool)),
-        (Null, Number(_)) => Some(Difference::TypeMismatch(Type::Null, Type::Number)),
-        (Null, String(_)) => Some(Difference::TypeMismatch(Type::Null, Type::String)),
-        (Null, Array(_)) => Some(Difference::TypeMismatch(Type::Null, Type::Array)),
-        (Null, Object(_)) => Some(Difference::TypeMismatch(Type::Null, Type::Object)),
-        (Bool(_), Null) => Some(Difference::TypeMismatch(Type::Bool, Type::Null)),
         (Bool(a), Bool(b)) => {
             if a == b {
                 None
@@ -189,12 +162,6 @@ pub fn values(a: serde_json::Value, b: serde_json::Value) -> Option<Difference> 
                 Some(Difference::ValueMismatch(ValueMismatch::Bool(a, b)))
             }
         }
-        (Bool(_), Number(_)) => Some(Difference::TypeMismatch(Type::Bool, Type::Number)),
-        (Bool(_), String(_)) => Some(Difference::TypeMismatch(Type::Bool, Type::String)),
-        (Bool(_), Array(_)) => Some(Difference::TypeMismatch(Type::Bool, Type::Array)),
-        (Bool(_), Object(_)) => Some(Difference::TypeMismatch(Type::Bool, Type::Object)),
-        (Number(_), Null) => Some(Difference::TypeMismatch(Type::Number, Type::Null)),
-        (Number(_), Bool(_)) => Some(Difference::TypeMismatch(Type::Number, Type::Bool)),
         (Number(a), Number(b)) => {
             if a == b {
                 None
@@ -202,12 +169,6 @@ pub fn values(a: serde_json::Value, b: serde_json::Value) -> Option<Difference> 
                 Some(Difference::ValueMismatch(ValueMismatch::Number(a, b)))
             }
         }
-        (Number(_), String(_)) => Some(Difference::TypeMismatch(Type::Number, Type::String)),
-        (Number(_), Array(_)) => Some(Difference::TypeMismatch(Type::Number, Type::Array)),
-        (Number(_), Object(_)) => Some(Difference::TypeMismatch(Type::Number, Type::Object)),
-        (String(_), Null) => Some(Difference::TypeMismatch(Type::String, Type::Null)),
-        (String(_), Bool(_)) => Some(Difference::TypeMismatch(Type::String, Type::Bool)),
-        (String(_), Number(_)) => Some(Difference::TypeMismatch(Type::String, Type::Number)),
         (String(a), String(b)) => {
             if a == b {
                 None
@@ -215,19 +176,8 @@ pub fn values(a: serde_json::Value, b: serde_json::Value) -> Option<Difference> 
                 Some(Difference::ValueMismatch(ValueMismatch::String(a, b)))
             }
         }
-        (String(_), Array(_)) => Some(Difference::TypeMismatch(Type::String, Type::Array)),
-        (String(_), Object(_)) => Some(Difference::TypeMismatch(Type::String, Type::Object)),
-        (Array(_), Null) => Some(Difference::TypeMismatch(Type::Array, Type::Null)),
-        (Array(_), Bool(_)) => Some(Difference::TypeMismatch(Type::Array, Type::Bool)),
-        (Array(_), Number(_)) => Some(Difference::TypeMismatch(Type::Array, Type::Number)),
-        (Array(_), String(_)) => Some(Difference::TypeMismatch(Type::Array, Type::String)),
         (Array(a), Array(b)) => arrays(a, b).map(Difference::Array),
-        (Array(_), Object(_)) => Some(Difference::TypeMismatch(Type::Array, Type::Object)),
-        (Object(_), Null) => Some(Difference::TypeMismatch(Type::Object, Type::Null)),
-        (Object(_), Bool(_)) => Some(Difference::TypeMismatch(Type::Object, Type::Bool)),
-        (Object(_), Number(_)) => Some(Difference::TypeMismatch(Type::Object, Type::Number)),
-        (Object(_), String(_)) => Some(Difference::TypeMismatch(Type::Object, Type::String)),
-        (Object(_), Array(_)) => Some(Difference::TypeMismatch(Type::Object, Type::Array)),
         (Object(a), Object(b)) => objects(a, b).map(Difference::Object),
+        (a, b) => Some(Difference::TypeMismatch(a.into(), b.into())),
     }
 }
