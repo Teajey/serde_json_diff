@@ -8,7 +8,7 @@ pub enum EntryDifference {
 }
 
 #[derive(Debug)]
-pub struct DumbMap<K: Serialize, V: Serialize>(Vec<(K, V)>);
+pub struct DumbMap<K: Serialize, V: Serialize>(pub Vec<(K, V)>);
 
 impl<K: Serialize, V: Serialize> Serialize for DumbMap<K, V> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
