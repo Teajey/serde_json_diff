@@ -19,7 +19,7 @@ fn kitchen_sink() {
       "different_elements": ["a", "ab"],
     });
 
-    let diff = serde_json_compare::values(a, b);
+    let diff = serde_json_diff::values(a, b);
 
     let diff = serde_json::to_value(diff).expect("couldn't serialize diff");
 

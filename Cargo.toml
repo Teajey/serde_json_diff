@@ -1,5 +1,5 @@
 [package]
-name = "serde_json_compare"
+name = "serde_json_diff"
 version = "0.1.0"
 license = "MIT"
 edition = "2021"
@@ -17,5 +17,5 @@ insta = "1.28.0"
 cli = ["clap", "thiserror"]
 
 [[bin]]
-name = "serde_json_compare"
+name = "serde_json_diff"
 required-features = ["cli"]

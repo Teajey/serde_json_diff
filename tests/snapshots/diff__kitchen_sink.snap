@@ -1,5 +1,5 @@
 ---
-source: tests/compare.rs
+source: tests/diff.rs
 expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
 ---
 {

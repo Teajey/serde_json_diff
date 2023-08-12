@@ -37,7 +37,7 @@ fn run() -> Result<Option<String>, Error> {
     let base_json = read_to_json(args.base_json)?;
     let compare_json = read_to_json(args.compare_json)?;
 
-    let possible_pretty_diff = serde_json_compare::objects(base_json, compare_json)
+    let possible_pretty_diff = serde_json_diff::objects(base_json, compare_json)
         .map(|diff| serde_json::to_string_pretty(&diff))
         .transpose()
         .expect("Failure to serialize should not be possible here");
