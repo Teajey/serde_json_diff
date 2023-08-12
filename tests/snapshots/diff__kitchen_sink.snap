@@ -11,10 +11,8 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
       "Element": {
         "1": {
           "difference_of": "Scalar",
-          "String": [
-            "a",
-            "ab"
-          ]
+          "source": "a",
+          "target": "ab"
         }
       }
     }
@@ -45,10 +43,8 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
     "entry_difference": "Deep",
     "diff": {
       "difference_of": "Scalar",
-      "Number": [
-        1,
-        2
-      ]
+      "source": 1,
+      "target": 2
     }
   },
   "extra_key": {

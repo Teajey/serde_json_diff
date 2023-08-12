@@ -10,10 +10,8 @@ expression: "serde_json::to_string_pretty(&diff).unwrap()"
     "entry_difference": "Deep",
     "diff": {
       "difference_of": "Scalar",
-      "Number": [
-        1,
-        2
-      ]
+      "source": 1,
+      "target": 2
     }
   },
   "b": {

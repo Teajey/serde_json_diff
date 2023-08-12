@@ -42,10 +42,20 @@ pub enum Type {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(untagged)]
 pub enum ScalarDifference {
-    Bool(bool, bool),
-    String(String, String),
-    Number(serde_json::Number, serde_json::Number),
+    Bool {
+        source: bool,
+        target: bool,
+    },
+    String {
+        source: String,
+        target: String,
+    },
+    Number {
+        source: serde_json::Number,
+        target: serde_json::Number,
+    },
 }
 
 #[derive(Debug, Serialize)]
@@ -133,25 +143,34 @@ pub fn values(a: serde_json::Value, b: serde_json::Value) -> Option<Difference> 
 
     match (a, b) {
         (Null, Null) => None,
-        (Bool(a), Bool(b)) => {
-            if a == b {
+        (Bool(source), Bool(target)) => {
+            if source == target {
                 None
             } else {
-                Some(Difference::Scalar(ScalarDifference::Bool(a, b)))
+                Some(Difference::Scalar(ScalarDifference::Bool {
+                    source,
+                    target,
+                }))
             }
         }
-        (Number(a), Number(b)) => {
-            if a == b {
+        (Number(source), Number(target)) => {
+            if source == target {
                 None
             } else {
-                Some(Difference::Scalar(ScalarDifference::Number(a, b)))
+                Some(Difference::Scalar(ScalarDifference::Number {
+                    source,
+                    target,
+                }))
             }
         }
-        (String(a), String(b)) => {
-            if a == b {
+        (String(source), String(target)) => {
+            if source == target {
                 None
             } else {
-                Some(Difference::Scalar(ScalarDifference::String(a, b)))
+                Some(Difference::Scalar(ScalarDifference::String {
+                    source,
+                    target,
+                }))
             }
         }
         (Array(a), Array(b)) => arrays(a, b).map(Difference::Array),
