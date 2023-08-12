@@ -1,0 +1,23 @@
+---
+source: tests/diff.rs
+expression: "serde_json::to_string_pretty(&diff).unwrap()"
+---
+{
+  "a": {
+    "entry_difference": "Missing"
+  },
+  "c": {
+    "entry_difference": "Deep",
+    "diff": {
+      "difference_of": "Scalar",
+      "Number": [
+        1,
+        2
+      ]
+    }
+  },
+  "b": {
+    "entry_difference": "Extra",
+    "value": false
+  }
+}

@@ -2,10 +2,11 @@
 use serde::{ser::SerializeMap, Serialize};
 
 #[derive(Debug, Serialize)]
+#[serde(tag = "entry_difference")]
 pub enum EntryDifference {
-    ExtraKey,
-    MissingKey,
-    Value(Difference),
+    Extra { value: serde_json::Value },
+    Missing,
+    Deep { diff: Difference },
 }
 
 #[derive(Debug)]
@@ -94,17 +95,16 @@ pub fn objects(
         .into_iter()
         .filter_map(|(key, a)| {
             let Some(b) = b.remove(&key) else {
-                return Some((key, EntryDifference::MissingKey));
+                return Some((key, EntryDifference::Missing));
             };
 
-            values(a, b).map(|diff| (key, EntryDifference::Value(diff)))
+            values(a, b).map(|diff| (key, EntryDifference::Deep { diff }))
         })
         .collect::<Vec<_>>();
 
-    value_differences.extend(
-        b.into_iter()
-            .map(|(extra_key, _)| (extra_key, EntryDifference::ExtraKey)),
-    );
+    value_differences.extend(b.into_iter().map(|(extra_key, extra_value)| {
+        (extra_key, EntryDifference::Extra { value: extra_value })
+    }));
 
     if value_differences.is_empty() {
         None

@@ -5,7 +5,8 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
 {
   "difference_of": "Object",
   "different_elements": {
-    "Value": {
+    "entry_difference": "Deep",
+    "diff": {
       "difference_of": "Array",
       "Element": {
         "1": {
@@ -19,7 +20,8 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
     }
   },
   "length_difference": {
-    "Value": {
+    "entry_difference": "Deep",
+    "diff": {
       "difference_of": "Array",
       "Length": [
         0,
@@ -27,16 +29,20 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
       ]
     }
   },
-  "missing_key": "MissingKey",
+  "missing_key": {
+    "entry_difference": "Missing"
+  },
   "type_difference": {
-    "Value": {
+    "entry_difference": "Deep",
+    "diff": {
       "difference_of": "Type",
       "source_type": "Number",
       "target_value": "1"
     }
   },
   "value_difference": {
-    "Value": {
+    "entry_difference": "Deep",
+    "diff": {
       "difference_of": "Scalar",
       "Number": [
         1,
@@ -44,5 +50,8 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
       ]
     }
   },
-  "extra_key": "ExtraKey"
+  "extra_key": {
+    "entry_difference": "Extra",
+    "value": "b"
+  }
 }

@@ -33,3 +33,22 @@ fn types() {
 
     insta::assert_snapshot!(serde_json::to_string_pretty(&diff).unwrap());
 }
+
+#[test]
+fn entries() {
+    let left = json!({
+        "a": false,
+        "c": 1,
+    });
+    let right = json!({
+        "b": false,
+        "c": 2,
+    });
+
+    let diff = serde_json_diff::objects(
+        serde_json::from_value(left).unwrap(),
+        serde_json::from_value(right).unwrap(),
+    );
+
+    insta::assert_snapshot!(serde_json::to_string_pretty(&diff).unwrap());
+}
