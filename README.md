@@ -6,6 +6,7 @@ Create machine-readable JSON diffs
 
 ```rust
 # use serde_json::json;
+
 let a = json!({
   "list": [1, 2, 3],
   "object": {"a": "b"}
