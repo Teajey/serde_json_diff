@@ -4,20 +4,20 @@ use serde_json_diff::ArrayDifference;
 #[test]
 fn kitchen_sink() {
     let a = json!({
-      "matches": "a",
-      "missing_key": "a",
-      "value_difference": 1,
-      "type_difference": 1,
-      "length_difference": [],
-      "different_elements": ["a", "a"],
+      "A": "a",
+      "B": "a",
+      "D": 1,
+      "E": 1,
+      "F": [],
+      "G": ["a", "a"],
     });
     let b = json!({
-      "matches": "a",
-      "extra_key": "b",
-      "value_difference": 2,
-      "type_difference": "1",
-      "length_difference": [true],
-      "different_elements": ["a", "ab"],
+      "A": "a",
+      "C": "b",
+      "D": 2,
+      "E": "1",
+      "F": [true],
+      "G": ["a", "ab"],
     });
 
     let diff = serde_json_diff::values(a, b);
