@@ -37,6 +37,7 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
     "diff": {
       "difference_of": "Type",
       "source_type": "Number",
+      "target_type": "String",
       "target_value": "1"
     }
   },

@@ -5,5 +5,6 @@ expression: "serde_json::to_string_pretty(&diff).unwrap()"
 {
   "difference_of": "Type",
   "source_type": "String",
+  "target_type": "Bool",
   "target_value": true
 }

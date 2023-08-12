@@ -51,6 +51,7 @@ pub enum ScalarDifference {
 #[derive(Debug, Serialize)]
 pub struct TypeDifference {
     source_type: Type,
+    target_type: Type,
     target_value: serde_json::Value,
 }
 
@@ -157,6 +158,7 @@ pub fn values(a: serde_json::Value, b: serde_json::Value) -> Option<Difference> 
         (Object(a), Object(b)) => objects(a, b).map(Difference::Object),
         (a, b) => Some(Difference::Type(TypeDifference {
             source_type: a.into(),
+            target_type: b.clone().into(),
             target_value: b,
         })),
     }
