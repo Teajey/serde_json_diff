@@ -87,7 +87,9 @@ pub enum Difference {
     Scalar(ScalarDifference),
     Type(TypeDifference),
     Array(ArrayDifference),
-    Object(DumbMap<String, EntryDifference>),
+    Object {
+        different_entries: DumbMap<String, EntryDifference>,
+    },
 }
 
 #[must_use]
@@ -215,7 +217,8 @@ pub fn values(source: serde_json::Value, target: serde_json::Value) -> Option<Di
             }
         }
         (Array(source), Array(target)) => arrays(source, target).map(Difference::Array),
-        (Object(source), Object(target)) => objects(source, target).map(Difference::Object),
+        (Object(source), Object(target)) => objects(source, target)
+            .map(|different_entries| Difference::Object { different_entries }),
         (source, target) => Some(Difference::Type(TypeDifference {
             source_type: source.into(),
             target_type: target.clone().into(),
