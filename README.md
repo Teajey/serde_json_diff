@@ -26,7 +26,7 @@ and `Vec<serde_json::Value>`s respectively.
 
 ### CLI
 
-```
+```sh
 serde_json_diff my_json_file.json my_other_json_file.json
 ```
 
