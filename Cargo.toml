@@ -4,6 +4,9 @@ description = "Create machine-readable JSON diffs"
 version = "0.1.0"
 license = "MIT"
 edition = "2021"
+documentation = "https://docs.rs/serde_json_diff"
+repository = "https://github.com/Teajey/serde_json_diff"
+keywords = ["diff", "json", "serde", "serde_json"]
 
 [dependencies]
 clap = { version = "4", features = ["derive"], optional = true }
