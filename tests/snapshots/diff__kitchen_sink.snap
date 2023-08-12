@@ -3,48 +3,46 @@ source: tests/diff.rs
 expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
 ---
 {
-  "Object": {
-    "different_elements": {
-      "Value": {
-        "Array": {
-          "Element": {
-            "1": {
-              "Scalar": [
-                "a",
-                "ab"
-              ]
-            }
-          }
-        }
-      }
-    },
-    "extra_key": "ExtraKey",
-    "length_difference": {
-      "Value": {
-        "Array": {
-          "Length": [
-            0,
-            1
+  "difference_of": "Object",
+  "different_elements": {
+    "Value": {
+      "difference_of": "Array",
+      "Element": {
+        "1": {
+          "difference_of": "Scalar",
+          "String": [
+            "a",
+            "ab"
           ]
         }
       }
-    },
-    "missing_key": "MissingKey",
-    "type_difference": {
-      "Value": {
-        "Type": [
-          "Number",
-          "String"
-        ]
-      }
-    },
-    "value_difference": {
-      "Value": {
-        "Scalar": [
-          1,
-          2
-        ]
-      }
     }
-  }
+  },
+  "length_difference": {
+    "Value": {
+      "difference_of": "Array",
+      "Length": [
+        0,
+        1
+      ]
+    }
+  },
+  "missing_key": "MissingKey",
+  "type_difference": {
+    "Value": {
+      "difference_of": "Type",
+      "source_type": "Number",
+      "target_value": "1"
+    }
+  },
+  "value_difference": {
+    "Value": {
+      "difference_of": "Scalar",
+      "Number": [
+        1,
+        2
+      ]
+    }
+  },
+  "extra_key": "ExtraKey"
 }

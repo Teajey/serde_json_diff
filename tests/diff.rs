@@ -21,7 +21,15 @@ fn kitchen_sink() {
 
     let diff = serde_json_diff::values(a, b);
 
-    let diff = serde_json::to_value(diff).expect("couldn't serialize diff");
-
     insta::assert_snapshot!(serde_json::to_string_pretty(&diff).expect("couldn't pretty"));
+}
+
+#[test]
+fn types() {
+    let left = json!("a");
+    let right = json!(true);
+
+    let diff = serde_json_diff::values(left, right);
+
+    insta::assert_snapshot!(serde_json::to_string_pretty(&diff).unwrap());
 }
