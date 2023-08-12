@@ -5,14 +5,12 @@ Create machine-readable JSON diffs
 ### Library
 
 ```rust
-# use serde_json::json;
-
-let a = json!({
+let a = serde_json::json!({
   "list": [1, 2, 3],
   "object": {"a": "b"}
 });
 
-let b = json!({
+let b = serde_json::json!({
   "list": [1, 2, 3],
   "object": {"a": "b"}
 });
@@ -20,7 +18,7 @@ let b = json!({
 assert!(serde_json_diff::values(a, b).is_none());
 ```
 
-[`serde_json_diff::objects`](objects) and [`serde_json_diff::arrays`](arrays) are also exposed
+`serde_json_diff::objects` and `serde_json_diff::arrays` are also exposed
 specifically for comparing `serde_json::Map<String, serde_json::Value>`
 and `Vec<serde_json::Value>`s respectively.
 
@@ -59,7 +57,7 @@ To this file:
   "different_elements": ["a", "ab"]
 }
 ```
-Results in this diff ([`Difference`] type serialised as JSON):
+Results in this diff (`Difference` type serialised as JSON):
 ```json
 {
   "Object": {
