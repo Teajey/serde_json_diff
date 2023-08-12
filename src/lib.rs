@@ -26,9 +26,19 @@ impl<K: Serialize, V: Serialize> Serialize for DumbMap<K, V> {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(tag = "array_difference")]
 pub enum ArrayDifference {
-    Length(usize, usize),
-    Element(DumbMap<usize, Difference>),
+    PairsOnly {
+        different_pairs: DumbMap<usize, Difference>,
+    },
+    Shorter {
+        different_pairs: Option<DumbMap<usize, Difference>>,
+        extra_elements: Vec<serde_json::Value>,
+    },
+    Longer {
+        different_pairs: Option<DumbMap<usize, Difference>>,
+        missing_elements: usize,
+    },
 }
 
 #[derive(Debug, Serialize)]
@@ -75,25 +85,50 @@ pub enum Difference {
 }
 
 #[must_use]
-pub fn arrays(a: Vec<serde_json::Value>, b: Vec<serde_json::Value>) -> Option<ArrayDifference> {
-    let a_len = a.len();
-    let b_len = b.len();
+// FIXME: This feels pretty overwrought compared to `objects` and `values`. Maybe there's a better way to diff arrays...
+pub fn arrays(
+    source: Vec<serde_json::Value>,
+    target: Vec<serde_json::Value>,
+) -> Option<ArrayDifference> {
+    let mut source_iter = source.into_iter().enumerate().peekable();
+    let mut target_iter = target.into_iter().peekable();
 
-    if a_len != b_len {
-        return Some(ArrayDifference::Length(a_len, b_len));
+    let mut different_pairs = vec![];
+    while let (Some(_), Some(_)) = (source_iter.peek(), target_iter.peek()) {
+        let ((i, source), target) = match (source_iter.next(), target_iter.next()) {
+            (Some(source), Some(target)) => (source, target),
+            _ => unreachable!("checked by peek()"),
+        };
+        different_pairs.push(values(source, target).map(|diff| (i, diff)));
     }
-
-    let element_differences = a
-        .into_iter()
-        .zip(b.into_iter())
-        .enumerate()
-        .filter_map(|(i, (a, b))| values(a, b).map(|diff| (i, diff)))
-        .collect::<Vec<_>>();
-
-    if element_differences.is_empty() {
+    let different_pairs = different_pairs.into_iter().flatten().collect::<Vec<_>>();
+    let different_pairs = if different_pairs.is_empty() {
         None
     } else {
-        Some(ArrayDifference::Element(DumbMap(element_differences)))
+        Some(DumbMap(different_pairs))
+    };
+
+    let extra_elements = source_iter.map(|(_, source)| source).collect::<Vec<_>>();
+    let missing_elements = target_iter.collect::<Vec<_>>();
+
+    if !extra_elements.is_empty() {
+        return Some(ArrayDifference::Shorter {
+            different_pairs,
+            extra_elements,
+        });
+    }
+
+    if !missing_elements.is_empty() {
+        return Some(ArrayDifference::Longer {
+            different_pairs,
+            missing_elements: missing_elements.len(),
+        });
+    }
+
+    if let Some(different_pairs) = different_pairs {
+        Some(ArrayDifference::PairsOnly { different_pairs })
+    } else {
+        None
     }
 }
 

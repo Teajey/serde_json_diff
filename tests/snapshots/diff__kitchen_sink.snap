@@ -8,7 +8,8 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
     "entry_difference": "Deep",
     "diff": {
       "difference_of": "Array",
-      "Element": {
+      "array_difference": "PairsOnly",
+      "different_pairs": {
         "1": {
           "difference_of": "Scalar",
           "source": "a",
@@ -21,10 +22,9 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
     "entry_difference": "Deep",
     "diff": {
       "difference_of": "Array",
-      "Length": [
-        0,
-        1
-      ]
+      "array_difference": "Longer",
+      "different_pairs": null,
+      "missing_elements": 1
     }
   },
   "missing_key": {
