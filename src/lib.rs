@@ -1,3 +1,4 @@
+#![doc = include_str!("../README.md")]
 use serde::{ser::SerializeMap, Serialize};
 
 #[derive(Debug, Serialize)]

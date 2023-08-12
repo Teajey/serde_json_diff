@@ -1,8 +1,10 @@
+#![doc = include_str!("../README.md")]
 use std::path::PathBuf;
 
 use clap::Parser;
 
 #[derive(Parser)]
+/// Create machine-readable JSON diffs
 struct Args {
     /// Path to the JSON file you wish to compare against
     base_json: PathBuf,
