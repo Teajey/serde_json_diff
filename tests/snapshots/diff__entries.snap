@@ -7,8 +7,8 @@ expression: "serde_json::to_string_pretty(&diff).unwrap()"
     "entry_difference": "Missing"
   },
   "c": {
-    "entry_difference": "Deep",
-    "diff": {
+    "entry_difference": "Value",
+    "value_diff": {
       "difference_of": "Scalar",
       "source": 1,
       "target": 2

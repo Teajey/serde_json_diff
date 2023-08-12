@@ -4,9 +4,14 @@ use serde::{ser::SerializeMap, Serialize};
 #[derive(Debug, Serialize)]
 #[serde(tag = "entry_difference")]
 pub enum EntryDifference {
-    Extra { value: serde_json::Value },
+    Extra {
+        value: serde_json::Value,
+    },
     Missing,
-    Deep { diff: Difference },
+    /// The entry exists in both JSONs, but the values are different
+    Value {
+        value_diff: Difference,
+    },
 }
 
 #[derive(Debug)]
@@ -144,7 +149,7 @@ pub fn objects(
                 return Some((key, EntryDifference::Missing));
             };
 
-            values(a, b).map(|diff| (key, EntryDifference::Deep { diff }))
+            values(a, b).map(|diff| (key, EntryDifference::Value { value_diff: diff }))
         })
         .collect::<Vec<_>>();
 
