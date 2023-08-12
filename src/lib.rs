@@ -140,21 +140,21 @@ pub fn arrays(
 
 #[must_use]
 pub fn objects(
-    a: serde_json::Map<String, serde_json::Value>,
-    mut b: serde_json::Map<String, serde_json::Value>,
+    source: serde_json::Map<String, serde_json::Value>,
+    mut target: serde_json::Map<String, serde_json::Value>,
 ) -> Option<DumbMap<String, EntryDifference>> {
-    let mut value_differences = a
+    let mut value_differences = source
         .into_iter()
-        .filter_map(|(key, a)| {
-            let Some(b) = b.remove(&key) else {
+        .filter_map(|(key, source)| {
+            let Some(target) = target.remove(&key) else {
                 return Some((key, EntryDifference::Missing));
             };
 
-            values(a, b).map(|diff| (key, EntryDifference::Value { value_diff: diff }))
+            values(source, target).map(|diff| (key, EntryDifference::Value { value_diff: diff }))
         })
         .collect::<Vec<_>>();
 
-    value_differences.extend(b.into_iter().map(|(extra_key, extra_value)| {
+    value_differences.extend(target.into_iter().map(|(extra_key, extra_value)| {
         (extra_key, EntryDifference::Extra { value: extra_value })
     }));
 
@@ -179,10 +179,10 @@ impl From<serde_json::Value> for Type {
 }
 
 #[must_use]
-pub fn values(a: serde_json::Value, b: serde_json::Value) -> Option<Difference> {
+pub fn values(source: serde_json::Value, target: serde_json::Value) -> Option<Difference> {
     use serde_json::Value::{Array, Bool, Null, Number, Object, String};
 
-    match (a, b) {
+    match (source, target) {
         (Null, Null) => None,
         (Bool(source), Bool(target)) => {
             if source == target {
@@ -214,12 +214,12 @@ pub fn values(a: serde_json::Value, b: serde_json::Value) -> Option<Difference> 
                 }))
             }
         }
-        (Array(a), Array(b)) => arrays(a, b).map(Difference::Array),
-        (Object(a), Object(b)) => objects(a, b).map(Difference::Object),
-        (a, b) => Some(Difference::Type(TypeDifference {
-            source_type: a.into(),
-            target_type: b.clone().into(),
-            target_value: b,
+        (Array(source), Array(target)) => arrays(source, target).map(Difference::Array),
+        (Object(source), Object(target)) => objects(source, target).map(Difference::Object),
+        (source, target) => Some(Difference::Type(TypeDifference {
+            source_type: source.into(),
+            target_type: target.clone().into(),
+            target_value: target,
         })),
     }
 }

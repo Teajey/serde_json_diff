@@ -7,10 +7,10 @@ use clap::Parser;
 /// Create machine-readable JSON diffs
 struct Args {
     /// Path to the JSON file you wish to compare against
-    base_json: PathBuf,
+    source_json: PathBuf,
 
     /// Path to the JSON file to be compared
-    compare_json: PathBuf,
+    target_json: PathBuf,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -34,10 +34,10 @@ fn read_to_json(path: PathBuf) -> Result<serde_json::Map<String, serde_json::Val
 fn run() -> Result<Option<String>, Error> {
     let args = Args::parse();
 
-    let base_json = read_to_json(args.base_json)?;
-    let compare_json = read_to_json(args.compare_json)?;
+    let source_json = read_to_json(args.source_json)?;
+    let target_json = read_to_json(args.target_json)?;
 
-    let possible_pretty_diff = serde_json_diff::objects(base_json, compare_json)
+    let possible_pretty_diff = serde_json_diff::objects(source_json, target_json)
         .map(|diff| serde_json::to_string_pretty(&diff))
         .transpose()
         .expect("Failure to serialize should not be possible here");
