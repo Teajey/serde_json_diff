@@ -60,48 +60,54 @@ To this file:
 Results in this diff (`Difference` type serialised as JSON):
 ```json
 {
-  "Object": {
-    "different_elements": {
-      "Value": {
-        "Array": {
-          "Element": {
-            "1": {
-              "Scalar": [
-                "a",
-                "ab"
-              ]
-            }
+  "difference_of": "object",
+  "different_entries": {
+    "B": {
+      "entry_difference": "missing"
+    },
+    "D": {
+      "entry_difference": "value",
+      "value_diff": {
+        "difference_of": "scalar",
+        "source": 1,
+        "target": 2
+      }
+    },
+    "E": {
+      "entry_difference": "value",
+      "value_diff": {
+        "difference_of": "type",
+        "source_type": "number",
+        "target_type": "string",
+        "target_value": "1"
+      }
+    },
+    "F": {
+      "entry_difference": "value",
+      "value_diff": {
+        "difference_of": "array",
+        "array_difference": "longer",
+        "different_pairs": null,
+        "missing_elements": 1
+      }
+    },
+    "G": {
+      "entry_difference": "value",
+      "value_diff": {
+        "difference_of": "array",
+        "array_difference": "pairs_only",
+        "different_pairs": {
+          "1": {
+            "difference_of": "scalar",
+            "source": "a",
+            "target": "ab"
           }
         }
       }
     },
-    "extra_key": "ExtraKey",
-    "length_difference": {
-      "Value": {
-        "Array": {
-          "Length": [
-            0,
-            1
-          ]
-        }
-      }
-    },
-    "missing_key": "MissingKey",
-    "type_difference": {
-      "Value": {
-        "Type": [
-          "Number",
-          "String"
-        ]
-      }
-    },
-    "value_difference": {
-      "Value": {
-        "Scalar": [
-          1,
-          2
-        ]
-      }
+    "C": {
+      "entry_difference": "extra",
+      "value": "b"
     }
   }
 }
