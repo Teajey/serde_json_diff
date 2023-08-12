@@ -3,8 +3,8 @@ source: tests/diff.rs
 expression: "serde_json::to_string_pretty(&diff).unwrap()"
 ---
 {
-  "difference_of": "Type",
-  "source_type": "String",
-  "target_type": "Bool",
+  "difference_of": "type",
+  "source_type": "string",
+  "target_type": "bool",
   "target_value": true
 }

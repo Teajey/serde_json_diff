@@ -2,7 +2,7 @@
 use serde::{ser::SerializeMap, Serialize};
 
 #[derive(Debug, Serialize)]
-#[serde(tag = "entry_difference")]
+#[serde(tag = "entry_difference", rename_all = "snake_case")]
 pub enum EntryDifference {
     Extra {
         value: serde_json::Value,
@@ -31,7 +31,7 @@ impl<K: Serialize, V: Serialize> Serialize for DumbMap<K, V> {
 }
 
 #[derive(Debug, Serialize)]
-#[serde(tag = "array_difference")]
+#[serde(tag = "array_difference", rename_all = "snake_case")]
 pub enum ArrayDifference {
     PairsOnly {
         different_pairs: DumbMap<usize, Difference>,
@@ -47,6 +47,7 @@ pub enum ArrayDifference {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Type {
     Null,
     Array,
@@ -81,7 +82,7 @@ pub struct TypeDifference {
 }
 
 #[derive(Debug, Serialize)]
-#[serde(tag = "difference_of")]
+#[serde(tag = "difference_of", rename_all = "snake_case")]
 pub enum Difference {
     Scalar(ScalarDifference),
     Type(TypeDifference),
