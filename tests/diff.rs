@@ -20,7 +20,10 @@ fn kitchen_sink() {
       "G": ["a", "ab"],
     });
 
-    let diff = serde_json_diff::values(a, b);
+    let diff = serde_json_diff::objects(
+        serde_json::from_value(a).unwrap(),
+        serde_json::from_value(b).unwrap(),
+    );
 
     insta::assert_snapshot!(serde_json::to_string_pretty(&diff).expect("couldn't pretty"));
 }

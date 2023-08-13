@@ -57,59 +57,55 @@ To this file:
   "G": ["a", "ab"]
 }
 ```
-Results in this diff (`Difference` type serialised as JSON):
+Results in this diff (serialised as JSON):
 ```json
 {
-  "difference_of": "object",
-  "different_entries": {
-    "B": {
-      "entry_difference": "missing"
-    },
-    "D": {
-      "entry_difference": "value",
-      "value_diff": {
-        "difference_of": "scalar",
-        "source": 1,
-        "target": 2
-      }
-    },
-    "E": {
-      "entry_difference": "value",
-      "value_diff": {
-        "difference_of": "type",
-        "source_type": "number",
-        "target_type": "string",
-        "target_value": "1"
-      }
-    },
-    "F": {
-      "entry_difference": "value",
-      "value_diff": {
-        "difference_of": "array",
-        "array_difference": "longer",
-        "different_pairs": null,
-        "missing_elements": 1
-      }
-    },
-    "G": {
-      "entry_difference": "value",
-      "value_diff": {
-        "difference_of": "array",
-        "array_difference": "pairs_only",
-        "different_pairs": {
-          "1": {
-            "difference_of": "scalar",
-            "source": "a",
-            "target": "ab"
-          }
+  "B": {
+    "entry_difference": "extra"
+  },
+  "D": {
+    "entry_difference": "value",
+    "value_diff": {
+      "difference_of": "scalar",
+      "source": 1,
+      "target": 2
+    }
+  },
+  "E": {
+    "entry_difference": "value",
+    "value_diff": {
+      "difference_of": "type",
+      "source_type": "number",
+      "target_type": "string",
+      "target_value": "1"
+    }
+  },
+  "F": {
+    "entry_difference": "value",
+    "value_diff": {
+      "difference_of": "array",
+      "array_difference": "longer",
+      "different_pairs": null,
+      "missing_elements": 1
+    }
+  },
+  "G": {
+    "entry_difference": "value",
+    "value_diff": {
+      "difference_of": "array",
+      "array_difference": "pairs_only",
+      "different_pairs": {
+        "1": {
+          "difference_of": "scalar",
+          "source": "a",
+          "target": "ab"
         }
       }
-    },
-    "C": {
-      "entry_difference": "extra",
-      "value": "b"
     }
+  },
+  "C": {
+    "entry_difference": "missing",
+    "value": "b"
   }
 }
 ```
-Admittedly, the output is not particularly human-readable or intuitive in JSON form. So I'm very open to suggestions on how this can be improved! 😇
