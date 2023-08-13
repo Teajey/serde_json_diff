@@ -5,14 +5,12 @@ Create machine-readable JSON diffs
 ### Library
 
 ```rust
-# use serde_json::json;
-
-let a = json!({
+let a = serde_json::json!({
   "list": [1, 2, 3],
   "object": {"a": "b"}
 });
 
-let b = json!({
+let b = serde_json::json!({
   "list": [1, 2, 3],
   "object": {"a": "b"}
 });
@@ -20,7 +18,7 @@ let b = json!({
 assert!(serde_json_diff::values(a, b).is_none());
 ```
 
-[`serde_json_diff::objects`](objects) and [`serde_json_diff::arrays`](arrays) are also exposed
+`serde_json_diff::objects` and `serde_json_diff::arrays` are also exposed
 specifically for comparing `serde_json::Map<String, serde_json::Value>`
 and `Vec<serde_json::Value>`s respectively.
 
@@ -40,72 +38,74 @@ alias jdiff="serde_json_diff"
 Comparing this file:
 ```json
 {
-  "matches": "a",
-  "missing_key": "a",
-  "value_difference": 1,
-  "type_difference": 1,
-  "length_difference": [],
-  "different_elements": ["a", "a"]
+  "A": "a",
+  "B": "a",
+  "D": 1,
+  "E": 1,
+  "F": [],
+  "G": ["a", "a"]
 }
 ```
 To this file:
 ```json
 {
-  "matches": "a",
-  "extra_key": "b",
-  "value_difference": 2,
-  "type_difference": "1",
-  "length_difference": [true],
-  "different_elements": ["a", "ab"]
+  "A": "a",
+  "C": "b",
+  "D": 2,
+  "E": "1",
+  "F": [true],
+  "G": ["a", "ab"]
 }
 ```
-Results in this diff ([`Difference`] type serialised as JSON):
+Results in this diff (serialised as JSON):
 ```json
 {
-  "Object": {
-    "different_elements": {
-      "Value": {
-        "Array": {
-          "Element": {
-            "1": {
-              "Scalar": [
-                "a",
-                "ab"
-              ]
-            }
-          }
+  "B": {
+    "entry_difference": "extra"
+  },
+  "D": {
+    "entry_difference": "value",
+    "value_diff": {
+      "difference_of": "scalar",
+      "source": 1,
+      "target": 2
+    }
+  },
+  "E": {
+    "entry_difference": "value",
+    "value_diff": {
+      "difference_of": "type",
+      "source_type": "number",
+      "target_type": "string",
+      "target_value": "1"
+    }
+  },
+  "F": {
+    "entry_difference": "value",
+    "value_diff": {
+      "difference_of": "array",
+      "array_difference": "longer",
+      "different_pairs": null,
+      "missing_elements": 1
+    }
+  },
+  "G": {
+    "entry_difference": "value",
+    "value_diff": {
+      "difference_of": "array",
+      "array_difference": "pairs_only",
+      "different_pairs": {
+        "1": {
+          "difference_of": "scalar",
+          "source": "a",
+          "target": "ab"
         }
-      }
-    },
-    "extra_key": "ExtraKey",
-    "length_difference": {
-      "Value": {
-        "Array": {
-          "Length": [
-            0,
-            1
-          ]
-        }
-      }
-    },
-    "missing_key": "MissingKey",
-    "type_difference": {
-      "Value": {
-        "Type": [
-          "Number",
-          "String"
-        ]
-      }
-    },
-    "value_difference": {
-      "Value": {
-        "Scalar": [
-          1,
-          2
-        ]
       }
     }
+  },
+  "C": {
+    "entry_difference": "missing",
+    "value": "b"
   }
 }
 ```
-Admittedly, the output is not particularly human-readable or intuitive in JSON form. So I'm very open to suggestions on how this can be improved! 😇
