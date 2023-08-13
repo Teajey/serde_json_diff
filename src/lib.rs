@@ -76,17 +76,14 @@ pub enum ScalarDifference {
 }
 
 #[derive(Debug, Serialize)]
-pub struct TypeDifference {
-    source_type: Type,
-    target_type: Type,
-    target_value: serde_json::Value,
-}
-
-#[derive(Debug, Serialize)]
 #[serde(tag = "difference_of", rename_all = "snake_case")]
 pub enum Difference {
     Scalar(ScalarDifference),
-    Type(TypeDifference),
+    Type {
+        source_type: Type,
+        target_type: Type,
+        target_value: serde_json::Value,
+    },
     Array(ArrayDifference),
     Object {
         different_entries: DumbMap<String, EntryDifference>,
@@ -225,10 +222,10 @@ pub fn values(source: serde_json::Value, target: serde_json::Value) -> Option<Di
         (Array(source), Array(target)) => arrays(source, target).map(Difference::Array),
         (Object(source), Object(target)) => objects(source, target)
             .map(|different_entries| Difference::Object { different_entries }),
-        (source, target) => Some(Difference::Type(TypeDifference {
+        (source, target) => Some(Difference::Type {
             source_type: source.into(),
             target_type: target.clone().into(),
             target_value: target,
-        })),
+        }),
     }
 }
