@@ -67,7 +67,7 @@ fn arrays() {
         serde_json::from_value(target).unwrap(),
     );
 
-    assert!(matches!(diff, Some(ArrayDifference::Longer { .. })));
+    assert!(matches!(diff, Some(ArrayDifference::Shorter { .. })));
 
     let source = json!([true]);
     let target = json!([]);
@@ -77,7 +77,7 @@ fn arrays() {
         serde_json::from_value(target).unwrap(),
     );
 
-    assert!(matches!(diff, Some(ArrayDifference::Shorter { .. })));
+    assert!(matches!(diff, Some(ArrayDifference::Longer { .. })));
 
     let source = json!([true]);
     let target = json!([false]);
