@@ -1,5 +1,5 @@
 #![doc = include_str!("../README.md")]
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use clap::Parser;
 
@@ -22,20 +22,20 @@ enum Error {
     SerdeParse(PathBuf, serde_json::Error),
 }
 
-fn read_to_json(path: PathBuf) -> Result<serde_json::Map<String, serde_json::Value>, Error> {
+fn read_to_json(path: &Path) -> Result<serde_json::Map<String, serde_json::Value>, Error> {
     serde_json::from_str(
-        std::fs::read_to_string(&path)
-            .map_err(|err| Error::FileRead(path.clone(), err))?
+        std::fs::read_to_string(path)
+            .map_err(|err| Error::FileRead(path.to_path_buf(), err))?
             .as_str(),
     )
-    .map_err(|err| Error::SerdeParse(path.clone(), err))
+    .map_err(|err| Error::SerdeParse(path.to_path_buf(), err))
 }
 
 fn run() -> Result<Option<String>, Error> {
     let args = Args::parse();
 
-    let source_json = read_to_json(args.source_json)?;
-    let target_json = read_to_json(args.target_json)?;
+    let source_json = read_to_json(args.source_json.as_path())?;
+    let target_json = read_to_json(args.target_json.as_path())?;
 
     let possible_pretty_diff = serde_json_diff::objects(source_json, target_json)
         .map(|diff| serde_json::to_string_pretty(&diff))

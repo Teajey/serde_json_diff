@@ -33,6 +33,7 @@ impl<K: Serialize, V: Serialize> Serialize for DumbMap<K, V> {
 pub enum ArrayDifference {
     /// `source` and `target` are the same length, but some values of the same indices are different
     PairsOnly {
+        /// differing pairs that appear in the overlapping indices of `source` and `target`
         different_pairs: DumbMap<usize, Difference>,
     },
     /// `source` is shorter than `target`
@@ -105,9 +106,8 @@ pub fn arrays(
 
     let mut different_pairs = vec![];
     while let (Some(_), Some(_)) = (source_iter.peek(), target_iter.peek()) {
-        let ((i, source), target) = match (source_iter.next(), target_iter.next()) {
-            (Some(source), Some(target)) => (source, target),
-            _ => unreachable!("checked by peek()"),
+        let (Some((i, source)), Some(target)) = (source_iter.next(), target_iter.next()) else {
+            unreachable!("checked by peek()");
         };
         different_pairs.push(values(source, target).map(|diff| (i, diff)));
     }
@@ -135,11 +135,7 @@ pub fn arrays(
         });
     }
 
-    if let Some(different_pairs) = different_pairs {
-        Some(ArrayDifference::PairsOnly { different_pairs })
-    } else {
-        None
-    }
+    different_pairs.map(|different_pairs| ArrayDifference::PairsOnly { different_pairs })
 }
 
 #[must_use]
