@@ -28,6 +28,14 @@ and `Vec<serde_json::Value>`s respectively.
 serde_json_diff my_json_file.json my_other_json_file.json
 ```
 
+#### Exit codes
+
+Exit code | Meaning
+---|---
+0 | No differences
+1 | Differences found
+2 | Runtime error
+
 Tip: Since the command name `serde_json_diff` is a bit long, I personally have it aliased in my shell config:
 ```sh
 alias jdiff="serde_json_diff"
