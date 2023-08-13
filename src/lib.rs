@@ -6,7 +6,7 @@ use serde::{ser::SerializeMap, Serialize};
 pub enum EntryDifference {
     /// An entry from `target` that `source` is missing
     Missing { value: serde_json::Value },
-    /// An extraneous entry that `source` has, and `target` doesn't
+    /// An entry that `source` has, and `target` doesn't
     Extra,
     /// The entry exists in both JSONs, but the values are different
     Value { value_diff: Difference },
@@ -31,19 +31,23 @@ impl<K: Serialize, V: Serialize> Serialize for DumbMap<K, V> {
 #[derive(Debug, Serialize)]
 #[serde(tag = "array_difference", rename_all = "snake_case")]
 pub enum ArrayDifference {
-    /// `source` and `target` are the same length, but some values in the same indices are different
+    /// `source` and `target` are the same length, but some values of the same indices are different
     PairsOnly {
         different_pairs: DumbMap<usize, Difference>,
     },
     /// `source` is shorter than `target`
     Shorter {
+        /// differing pairs that appear in the overlapping indices of `source` and `target`
         different_pairs: Option<DumbMap<usize, Difference>>,
-        extra_elements: Vec<serde_json::Value>,
+        /// elements missing in `source` that appear in `target`
+        missing_elements: Vec<serde_json::Value>,
     },
     /// `source` is longer than `target`
     Longer {
+        /// differing pairs that appear in the overlapping indices of `source` and `target`
         different_pairs: Option<DumbMap<usize, Difference>>,
-        missing_elements: usize,
+        /// The amount of extra elements `source` has that `target` does not
+        extra_length: usize,
     },
 }
 
@@ -118,16 +122,16 @@ pub fn arrays(
     let missing_elements = target_iter.collect::<Vec<_>>();
 
     if !extra_elements.is_empty() {
-        return Some(ArrayDifference::Shorter {
+        return Some(ArrayDifference::Longer {
             different_pairs,
-            extra_elements,
+            extra_length: extra_elements.len(),
         });
     }
 
     if !missing_elements.is_empty() {
-        return Some(ArrayDifference::Longer {
+        return Some(ArrayDifference::Shorter {
             different_pairs,
-            missing_elements: missing_elements.len(),
+            missing_elements,
         });
     }
 

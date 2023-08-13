@@ -27,9 +27,11 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
     "entry_difference": "value",
     "value_diff": {
       "difference_of": "array",
-      "array_difference": "longer",
+      "array_difference": "shorter",
       "different_pairs": null,
-      "missing_elements": 1
+      "missing_elements": [
+        true
+      ]
     }
   },
   "G": {
