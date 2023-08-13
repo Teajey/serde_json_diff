@@ -4,7 +4,7 @@ expression: "serde_json::to_string_pretty(&diff).unwrap()"
 ---
 {
   "a": {
-    "entry_difference": "missing"
+    "entry_difference": "extra"
   },
   "c": {
     "entry_difference": "value",
@@ -15,7 +15,7 @@ expression: "serde_json::to_string_pretty(&diff).unwrap()"
     }
   },
   "b": {
-    "entry_difference": "extra",
+    "entry_difference": "missing",
     "value": false
   }
 }

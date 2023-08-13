@@ -6,7 +6,7 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
   "difference_of": "object",
   "different_entries": {
     "B": {
-      "entry_difference": "missing"
+      "entry_difference": "extra"
     },
     "D": {
       "entry_difference": "value",
@@ -49,7 +49,7 @@ expression: "serde_json::to_string_pretty(&diff).expect(\"couldn't pretty\")"
       }
     },
     "C": {
-      "entry_difference": "extra",
+      "entry_difference": "missing",
       "value": "b"
     }
   }

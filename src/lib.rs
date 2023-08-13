@@ -4,14 +4,12 @@ use serde::{ser::SerializeMap, Serialize};
 #[derive(Debug, Serialize)]
 #[serde(tag = "entry_difference", rename_all = "snake_case")]
 pub enum EntryDifference {
-    Extra {
-        value: serde_json::Value,
-    },
-    Missing,
+    /// An entry from `target` that `source` is missing
+    Missing { value: serde_json::Value },
+    /// An extraneous entry that `source` has, and `target` doesn't
+    Extra,
     /// The entry exists in both JSONs, but the values are different
-    Value {
-        value_diff: Difference,
-    },
+    Value { value_diff: Difference },
 }
 
 #[derive(Debug)]
@@ -33,13 +31,16 @@ impl<K: Serialize, V: Serialize> Serialize for DumbMap<K, V> {
 #[derive(Debug, Serialize)]
 #[serde(tag = "array_difference", rename_all = "snake_case")]
 pub enum ArrayDifference {
+    /// `source` and `target` are the same length, but some values in the same indices are different
     PairsOnly {
         different_pairs: DumbMap<usize, Difference>,
     },
+    /// `source` is shorter than `target`
     Shorter {
         different_pairs: Option<DumbMap<usize, Difference>>,
         extra_elements: Vec<serde_json::Value>,
     },
+    /// `source` is longer than `target`
     Longer {
         different_pairs: Option<DumbMap<usize, Difference>>,
         missing_elements: usize,
@@ -149,15 +150,20 @@ pub fn objects(
         .into_iter()
         .filter_map(|(key, source)| {
             let Some(target) = target.remove(&key) else {
-                return Some((key, EntryDifference::Missing));
+                return Some((key, EntryDifference::Extra));
             };
 
             values(source, target).map(|diff| (key, EntryDifference::Value { value_diff: diff }))
         })
         .collect::<Vec<_>>();
 
-    value_differences.extend(target.into_iter().map(|(extra_key, extra_value)| {
-        (extra_key, EntryDifference::Extra { value: extra_value })
+    value_differences.extend(target.into_iter().map(|(missing_key, missing_value)| {
+        (
+            missing_key,
+            EntryDifference::Missing {
+                value: missing_value,
+            },
+        )
     }));
 
     if value_differences.is_empty() {
