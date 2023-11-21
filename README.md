@@ -18,6 +18,12 @@ let b = serde_json::json!({
 assert!(serde_json_diff::values(a, b).is_none());
 ```
 
+> :warning: **Warning**
+>
+> The above example is just for simplicity's sake. This library allows you to extract the difference between two `serde_json::Value` _in detail_.
+>
+> If all you need is to check for equivalence, it's possible to just do an equality check: `==` 
+
 `serde_json_diff::objects` and `serde_json_diff::arrays` are also exposed
 specifically for comparing `serde_json::Map<String, serde_json::Value>`
 and `Vec<serde_json::Value>`s respectively.
